@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="ur" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اردو ایم سی کیو کوئز - 12th Bihar Board (Part 2)</title>
+    
+    <!-- Good Urdu Font: Noto Nastaliq Urdu -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --bg-color: #f4f7f6;
+            --white: #ffffff;
+            --red: #e74c3c;
+            --red-hover: #c0392b;
+            --green: #27ae60;
+            --correct-bg: #d4edda;
+            --correct-border: #c3e6cb;
+            --wrong-bg: #f8d7da;
+            --wrong-border: #f5c6cb;
+        }
+
+        body {
+            font-family: 'Noto Nastaliq Urdu', serif;
+            background-color: var(--bg-color);
+            color: var(--primary-color);
+            margin: 0;
+            padding: 20px;
+            line-height: 2.2;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: var(--white);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary-color);
+            border-bottom: 2px solid #eee;
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+            font-size: 1.8rem;
+        }
+
+        .question-card {
+            margin-bottom: 25px;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            background-color: #fafafa;
+            transition: all 0.3s ease;
+        }
+
+        .question-text {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #000;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .option-label {
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            background: var(--white);
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: background 0.2s, border-color 0.2s;
+        }
+
+        .option-label:hover {
+            background: #f0f0f0;
+        }
+
+        .option-label input[type="radio"] {
+            margin-left: 15px;
+            transform: scale(1.3);
+            cursor: pointer;
+        }
+
+        /* Submit Button */
+        .submit-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            font-family: 'Noto Nastaliq Urdu', serif;
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: white;
+            background-color: var(--red);
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin-top: 30px;
+        }
+
+        .submit-btn:hover {
+            background-color: var(--red-hover);
+        }
+
+        /* Score Display */
+        .score-container {
+            display: none;
+            text-align: center;
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--green);
+            margin-top: 25px;
+            padding: 20px;
+            border: 2px solid var(--green);
+            border-radius: 10px;
+            background-color: #e8f8f5;
+        }
+
+        /* Correct/Incorrect Highlights after submit */
+        .correct-ans {
+            background-color: var(--correct-bg) !important;
+            border-color: var(--correct-border) !important;
+            font-weight: bold;
+        }
+
+        .wrong-ans {
+            background-color: var(--wrong-bg) !important;
+            border-color: var(--wrong-border) !important;
+        }
+
+        /* Disabled state */
+        input[type="radio"]:disabled {
+            cursor: not-allowed;
+        }
+        .disabled-label {
+            cursor: not-allowed;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>اردو ایم سی کیو کوئز (12th Bihar Board - Part 2)</h1>
+        <div id="quiz-container"></div>
+        
+        <button id="submit-btn" class="submit-btn">جمع کرائیں (Submit)</button>
+        
+        <div id="score-display" class="score-container">
+            آپ کا اسکور: <span id="score-value">0</span> / <span id="total-questions">0</span>
+        </div>
+    </div>
+
+    <script>
+        // یہاں آپ کے دیے گئے تمام سوالات کا ڈیٹا ہے
+        const quizData = [
+            { q: "خاکہ نگاری کسے کہتے ہیں؟", options: ["کسی کی سوانح عمری لکھنا", "کسی کی ظاہری اور باطنی تصویر کشی کرنا", "کہانی لکھنا", "مضمون لکھنا"], correct: 1 },
+            { q: "مرزا فرحت اللہ بیگ کس صنفِ ادب کے لیے مشہور ہیں؟", options: ["افسانہ نگاری", "خاکہ نگاری", "ڈرامہ نگاری", "شاعری"], correct: 1 },
+            { q: "\"نظیر احمد کی کہانی\" کے خاکہ نگار کون ہیں؟", options: ["مولوی عبدالحق", "فرحت اللہ بیگ", "رشید احمد صدیقی", "پطرس بخاری"], correct: 2 },
+            { q: "\"مٹی کا تیل\" کس طرح کا مضمون ہے؟", options: ["طنزیہ", "سنجیدہ", "تنقیدی", "تاریخی"], correct: 0 },
+            { q: "\"کچھ پرانے لفظوں کی نئی تحقیق\" کا موضوع کیا ہے؟", options: ["پرانے الفاظ کی تحقیق", "نئے الفاظ کی ایجاد", "گرامر کی درستی", "محاوروں کی اصلاح"], correct: 0 },
+            { q: "\"انشائیہ کیا ہے\" میں انشائیہ کی کون سی خوبیاں بیان کی گئی ہیں؟", options: ["سنجیدگی", "مزاح اور بے تکلفی", "رنج و غم", "لمبی بحث"], correct: 1 },
+            { q: "\"ہجرت\" کس ادبی صنف سے تعلق رکھتی ہے؟", options: ["افسانہ", "انشائیہ", "ناول", "ڈرامہ"], correct: 1 },
+            { q: "\"باغ و بہار\" کے مصنف کون ہیں؟", options: ["میر امن دہلوی", "رجب علی بیگ سرور", "سعادت حسن منٹو", "پریم چند"], correct: 0 },
+            { q: "\"باغ و بہار\" کی زبان کیسی ہے؟", options: ["سادہ اور روزمرہ", "پیچیدہ", "فارسی آمیز", "مشکل"], correct: 0 },
+            { q: "\"ٹوبہ ٹیک سنگھ\" کے مصنف کون ہیں؟", options: ["کرشن چندر", "راجندر سنگھ بیدی", "سعادت حسن منٹو", "پریم چند"], correct: 2 },
+            { q: "\"ٹوبہ ٹیک سنگھ\" کس ملک کی تقسیم کے پس منظر میں لکھا گیا ہے؟", options: ["تقسیم ہند", "تقسیم بنگال", "جنگ عظیم", "تقسیم فلسطین"], correct: 0 },
+            { q: "\"بھولے بسرے گیت\" کس صنف کی تخلیق ہے؟", options: ["غزل", "نظم", "گیت", "نظم معریٰ"], correct: 1 },
+            { q: "\"ابراہیم سقہ\" کس ادبی صنف سے تعلق رکھتا ہے؟", options: ["افسانہ", "ڈرامہ", "نظم", "تنقید"], correct: 2 },
+            { q: "\"غبار خاطر\" کے مصنف کون ہیں؟", options: ["غالب", "مولانا آزاد", "سرسید", "اقبال"], correct: 0 },
+            { q: "غبار خاطر میں کس طرح کے خطوط شامل ہیں؟", options: ["دوستوں کے نام", "سرکاری", "تجارتی", "مذہبی"], correct: 0 },
+            { q: "خط نگاری کسے کہتے ہیں؟", options: ["خط لکھنے کا فن", "کہانی لکھنے کا فن", "شاعری کا فن", "تنقید کا فن"], correct: 0 },
+            { q: "مولانا ابوالکلام آزاد کا تعلق کس شہر سے تھا؟", options: ["دہلی", "لکھنؤ", "مکہ", "کلکتہ"], correct: 2 },
+            { q: "\"فسانہ عجائب\" کے مصنف کون ہیں؟", options: ["میر امن", "رجب علی بیگ سرور", "مولوی عبدالحق", "سرسید"], correct: 1 },
+            { q: "فسانہ عجائب کس دور کی تخلیق ہے؟", options: ["قدیم داستانوں کا دور", "جدید افسانوں کا دور", "انگریزی دور", "آزادی کے بعد کا دور"], correct: 0 },
+            { q: "داستان اور ناول میں کیا فرق ہے؟", options: ["داستان میں جادو اور ناول میں حقیقت", "دونوں ایک ہی ہیں", "ناول لمبا ہوتا ہے", "کوئی فرق نہیں"], correct: 0 },
+            
+            { q: "\"گفتگو\" کس شاعر کی نظم ہے؟", options: ["فیض احمد فیض", "میر تقی میر", "علی سردار جعفری", "جوش ملیح آبادی"], correct: 0 },
+            { q: "\"میرا سفر\" کس شاعر کی تخلیق ہے؟", options: ["فیض احمد فیض", "علی سردار جعفری", "مجاز", "جوش"], correct: 1 },
+            { q: "\"کھیتی\" نظم کا بنیادی موضوع کیا ہے؟", options: ["کسان کی محنت", "شہر کی زندگی", "محبت", "سیاست"], correct: 0 },
+            { q: "\"برق کلیسا\" میں کس چیز کا بیان کیا گیا ہے؟", options: ["گرجا گھر کی خوبصورتی", "منڈر کی پوجا", "مسجد کی عبادت", "جنگل کا منظر"], correct: 0 },
+            { q: "\"متشاعر\" کا کیا مطلب ہے؟", options: ["شاعر", "نثر نگار", "تنقید نگار", "قاری"], correct: 0 },
+            { q: "\"ہم نہیں جانتے\" نظم کا شاعر کون ہے؟", options: ["فیض احمد فیض", "میراجی", "ن م راشد", "مجاز"], correct: 1 },
+            { q: "\"شکستِ زنداں کا خواب\" کس کی نظم ہے؟", options: ["فیض احمد فیض", "علی سردار جعفری", "جوش", "مخدوم"], correct: 0 },
+            { q: "\"آوارہ\" نظم کے شاعر کون ہیں؟", options: ["مجاز لکھنوی", "فیض", "جوش", "اقبال"], correct: 0 },
+            { q: "\"ساتھی ہاتھ بڑھانا\" کس شاعر کا گیت ہے؟", options: ["ساحر لدھیانوی", "فیض", "جوش", "اقبال"], correct: 0 },
+            { q: "\"تو ہندو بنے گا نہ مسلمان بنے گا\" کس کا گیت ہے؟", options: ["اقبال", "غالب", "میر", "جوش"], correct: 0 },
+            { q: "\"تشحیک روزگار\" کس صنف کی تخلیق ہے؟", options: ["غزل", "نظم", "قصیدہ", "مثنوی"], correct: 1 },
+            { q: "قصیدہ نگاری کا بنیادی مقصد کیا ہوتا ہے؟", options: ["تعریف کرنا", "برائی کرنا", "کہانی سنانا", "نصیحت کرنا"], correct: 0 },
+            { q: "مرثیہ کسے کہتے ہیں؟", options: ["کسی کی وفات پر لکھا گیا", "شادی کا گیت", "جنگ کا قصہ", "عشق کا واقعہ"], correct: 0 },
+            { q: "مرثیہ میں کس طرح کے واقعات بیان کیے جاتے ہیں؟", options: ["کربلا کے واقعات", "جنگ آزادی", "محبت کے قصے", "دیومالائی کہانیاں"], correct: 0 },
+            { q: "غزل کے پہلے شعر کو کیا کہتے ہیں؟", options: ["مقطع", "مطلع", "ردیف", "قافیہ"], correct: 1 },
+            { q: "غزل کے آخری شعر کو کیا کہتے ہیں؟", options: ["مطلع", "مقطع", "بیت", "شعر"], correct: 1 },
+            { q: "غزل میں تخلص کا استعمال کس شعر میں ہوتا ہے؟", options: ["مطلع", "مقطع", "ہر شعر", "دوسرے شعر"], correct: 1 },
+            { q: "مطلع کسے کہتے ہیں؟", options: ["پہلا شعر", "آخری شعر", "درمیانی شعر", "کوئی بھی شعر"], correct: 0 },
+            { q: "مقطع کسے کہتے ہیں؟", options: ["پہلا شعر", "آخری شعر", "درمیانی شعر", "کوئی بھی شعر"], correct: 1 },
+            { q: "رباعی میں کل کتنے مصرعے ہوتے ہیں؟", options: ["دو", "تین", "چار", "پانچ"], correct: 2 },
+            
+            { q: "میر تقی میر کا پورا نام کیا تھا؟", options: ["میر تقی میر", "میر محمد تقی", "مرزا تقی", "تقی میر"], correct: 1 },
+            { q: "میر تقی میر کو کس لقب سے یاد کیا جاتا ہے؟", options: ["خدائے سخن", "شاعرِ اعظم", "امامِ غزل", "استادِ سخن"], correct: 0 },
+            { q: "میر کی شاعری کا بنیادی رنگ کیا ہے؟", options: ["رومانوی", "مزاحیہ", "طنزیہ", "اصلاحی"], correct: 0 },
+            { q: "مرزا غالب کا پورا نام کیا تھا؟", options: ["مرزا اسد اللہ خان غالب", "مرزا محمد اسد", "مرزا غالب", "اسد اللہ خان"], correct: 0 },
+            { q: "غالب کے والد کا نام کیا تھا؟", options: ["عبداللہ بیگ", "عبداللہ خان", "محمد بیگ", "اسد اللہ خان"], correct: 0 },
+            { q: "غالب کی شاعری میں کس چیز کی گہرائی دکھائی دیتی ہے؟", options: ["فلسفیانہ", "مزاحیہ", "رومانوی", "مذہبی"], correct: 0 },
+            { q: "میر اور غالب کی شاعری میں کیا فرق ہے؟", options: ["میر کی سادگی اور غالب کی پیچیدگی", "دونوں ایک جیسے", "میر فلسفی اور غالب رومانوی", "کوئی فرق نہیں"], correct: 0 },
+            { q: "میر انیس کس صنف کے لیے مشہور ہیں؟", options: ["مرثیہ", "غزل", "قصیدہ", "مثنوی"], correct: 0 },
+            { q: "مرزا دبیر کس صنف کے شاعر تھے؟", options: ["مرثیہ", "غزل", "قصیدہ", "مثنوی"], correct: 0 },
+            { q: "میر انیس کا تعلق کس شہر سے تھا؟", options: ["لکھنؤ", "دہلی", "فیض آباد", "آگرہ"], correct: 0 },
+            { q: "اقبال کا پورا نام کیا تھا؟", options: ["محمد اقبال", "علامہ اقبال", "سر محمد اقبال", "اقبال احمد"], correct: 0 },
+            { q: "علامہ اقبال کو کس لقب سے یاد کیا جاتا ہے؟", options: ["شاعرِ مشرق", "شاعرِ مغرب", "امامِ غزل", "استادِ سخن"], correct: 0 },
+            { q: "اقبال کی شاعری میں خودی کا کیا مقام ہے؟", options: ["بہت اہم", "کوئی اہمیت نہیں", "صرف ذکر", "معمولی"], correct: 0 },
+            { q: "\"بانگ درا\" کس کی کتاب ہے؟", options: ["اقبال", "غالب", "میر", "فیض"], correct: 0 },
+            { q: "\"بال جبریل\" کے مصنف کون ہیں؟", options: ["اقبال", "غالب", "میر", "فیض"], correct: 0 },
+            { q: "فیض احمد فیض کس ادبی تحریک سے متاثر تھے؟", options: ["ترقی پسند تحریک", "اصلاحی تحریک", "رومانوی تحریک", "کوئی نہیں"], correct: 0 },
+            { q: "فیض کی شاعری میں انقلاب کا کیا تصور ملتا ہے؟", options: ["اشتراکی انقلاب", "مذہبی انقلاب", "سماجی اصلاح", "کوئی نہیں"], correct: 0 },
+            { q: "جوش ملیح آبادی کو کس لقب سے یاد کیا جاتا ہے؟", options: ["شاعرِ انقلاب", "شاعرِ مشرق", "امامِ غزل", "استادِ سخن"], correct: 0 },
+            { q: "جوش ملیح آبادی کی شاعری کا انداز کیسا ہے؟", options: ["جوشیلا اور انقلابی", "سادہ", "رومانوی", "مزاحیہ"], correct: 0 },
+            { q: "شاد عظیم آبادی کا اصل نام کیا تھا؟", options: ["سید شاہد علی", "شاد علی", "سید شاد", "علی شاد"], correct: 0 },
+            
+            { q: "اسم کسے کہتے ہیں؟", options: ["کسی شخص، جگہ یا چیز کا نام", "کام کرنے کا نام", "حرف", "کوئی نہیں"], correct: 0 },
+            { q: "فعل کسے کہتے ہیں؟", options: ["کام یا حالت بتانے والا لفظ", "نام", "حرف", "کوئی نہیں"], correct: 0 },
+            { q: "حرف کسے کہتے ہیں؟", options: ["حروفِ تہجی", "اسم", "فعل", "کوئی نہیں"], correct: 0 },
+            { q: "اسمِ ذات کی ایک مثال دیجیے۔", options: ["دہلی", "لڑکا", "لکھنا", "وہ"], correct: 0 },
+            { q: "اسمِ موصول کسے کہتے ہیں؟", options: ["جوڑنے والا اسم", "نام", "فعل", "کوئی نہیں"], correct: 0 },
+            { q: "اسمِ اشارہ کی ایک مثال دیجیے۔", options: ["یہ", "لڑکا", "لکھنا", "دہلی"], correct: 0 },
+            { q: "اسمِ معرفہ کسے کہتے ہیں؟", options: ["مخصوص نام", "عام نام", "فعل", "کوئی نہیں"], correct: 0 },
+            { q: "اسمِ نکرہ کسے کہتے ہیں؟", options: ["عام نام", "مخصوص نام", "فعل", "کوئی نہیں"], correct: 0 },
+            { q: "اسمِ فعل کی ایک مثال دیجیے۔", options: ["لکھنا", "لڑکا", "دہلی", "وہ"], correct: 0 },
+            { q: "اسمِ مکان کسے کہتے ہیں؟", options: ["جگہ کا نام", "کسی کا نام", "فعل", "کوئی نہیں"], correct: 0 },
+            { q: "اسمِ زمان کسے کہتے ہیں؟", options: ["وقت کا نام", "جگہ کا نام", "فعل", "کوئی نہیں"], correct: 0 },
+            { q: "فعل ماضی کسے کہتے ہیں؟", options: ["گزرے ہوئے وقت کا فعل", "موجودہ وقت کا فعل", "آنے والے وقت کا فعل", "کوئی نہیں"], correct: 0 },
+            { q: "فعل مضارع کسے کہتے ہیں؟", options: ["موجودہ اور آنے والے وقت کا فعل", "گزرے وقت کا فعل", "حکم کا فعل", "کوئی نہیں"], correct: 0 },
+            { q: "فعل امر کسے کہتے ہیں؟", options: ["حکم کا فعل", "گزرے وقت کا فعل", "موجودہ وقت کا فعل", "کوئی نہیں"], correct: 0 },
+            { q: "ماضی قریب کی ایک مثال دیجیے۔", options: ["وہ آیا ہے", "وہ آیا تھا", "وہ آئے گا", "وہ آتا ہے"], correct: 0 },
+            { q: "ماضی بعید کی ایک مثال دیجیے۔", options: ["وہ آیا تھا", "وہ آیا ہے", "وہ آئے گا", "وہ آتا ہے"], correct: 0 },
+            { q: "مضارع مطلق کی ایک مثال دیجیے۔", options: ["وہ آتا ہے", "وہ آیا", "وہ آئے گا", "وہ آیا ہے"], correct: 0 },
+            { q: "واحد کسے کہتے ہیں؟", options: ["ایک کی تعداد", "دو کی تعداد", "تین کی تعداد", "چار کی تعداد"], correct: 0 },
+            { q: "جمع کسے کہتے ہیں؟", options: ["دو یا دو سے زیادہ کی تعداد", "ایک کی تعداد", "صفر کی تعداد", "کوئی نہیں"], correct: 0 },
+            { q: "جمع سالم اور جمع مکسر میں کیا فرق ہے؟", options: ["جمع سالم میں الفاظ اصل رہتے ہیں اور مکسر میں بدل جاتے ہیں", "دونوں ایک ہیں", "کوئی فرق نہیں", "الفاظ بدلتے نہیں"], correct: 0 },
+            
+            { q: "مترادف الفاظ کسے کہتے ہیں؟", options: ["ہم معنی الفاظ", "متضاد الفاظ", "محاورے", "کوئی نہیں"], correct: 0 },
+            { q: "متضاد الفاظ کسے کہتے ہیں؟", options: ["متضاد معنی والے الفاظ", "ہم معنی الفاظ", "محاورے", "کوئی نہیں"], correct: 0 },
+            { q: "محاورہ کسے کہتے ہیں؟", options: ["خاص معنی میں استعمال ہونے والا فقرہ", "عام جملہ", "ضرب المثل", "کوئی نہیں"], correct: 0 },
+            { q: "ضرب المثل کسے کہتے ہیں؟", options: ["مشہور کہاوت", "محاورہ", "ہم معنی", "متضاد"], correct: 0 },
+            { q: "لفظ اور کلمہ میں کیا فرق ہے؟", options: ["لفظ بامعنی ہوتا ہے اور کلمہ بھی بامعنی", "دونوں ایک ہیں", "کوئی فرق نہیں", "لفظ بے معنی ہے"], correct: 0 },
+            { q: "مذکر اور مونث کسے کہتے ہیں؟", options: ["مذکر نر اور مونث مادہ", "دونوں ایک ہیں", "کوئی نہیں", "صرف نام"], correct: 0 },
+            { q: "\"علم\" کا مترادف کیا ہے؟", options: ["دانش", "جہالت", "نا واقفیت", "بے خبری"], correct: 0 },
+            { q: "\"آزادی\" کی ضد کیا ہے؟", options: ["غلامی", "آزادی", "قید", "بندگی"], correct: 0 },
+            { q: "\"خوشی\" کا مترادف کیا ہے؟", options: ["مسرت", "غم", "دکھ", "رنج"], correct: 0 },
+            { q: "\"بہادر\" کی ضد کیا ہے؟", options: ["بزدل", "دلیر", "سورما", "کوئی نہیں"], correct: 0 },
+            { q: "\"قدیم\" کی ضد کیا ہے؟", options: ["جدید", "پرانا", "قدیم", "کوئی نہیں"], correct: 0 },
+            { q: "\"آسمان\" کا مترادف کیا ہے؟", options: ["فلک", "زمین", "پاتال", "کوئی نہیں"], correct: 0 },
+            { q: "\"تاریکی\" کی ضد کیا ہے؟", options: ["روشنی", "اندھیرا", "رات", "کوئی نہیں"], correct: 0 },
+            { q: "\"انصاف\" کی ضد کیا ہے؟", options: ["ظلم", "انصاف", "عدل", "کوئی نہیں"], correct: 0 },
+            { q: "\"عقل\" کا مترادف کیا ہے؟", options: ["سمجھ", "بے وقوفی", "نادانی", "جہالت"], correct: 0 },
+            { q: "\"دوستی\" کی ضد کیا ہے؟", options: ["دشمنی", "دوستی", "محبت", "کوئی نہیں"], correct: 0 },
+            { q: "\"معلوم\" کی ضد کیا ہے؟", options: ["نامعلوم", "معلوم", "جاننا", "کوئی نہیں"], correct: 0 },
+            { q: "\"حاضر\" کی ضد کیا ہے؟", options: ["غائب", "حاضر", "موجود", "کوئی نہیں"], correct: 0 },
+            { q: "\"کامیابی\" کی ضد کیا ہے؟", options: ["ناکامی", "کامیابی", "فتح", "کوئی نہیں"], correct: 0 },
+            { q: "\"محبت\" کا مترادف کیا ہے؟", options: ["الفت", "نفرت", "دشمنی", "کوئی نہیں"], correct: 0 }
+        ];
+
+        const quizContainer = document.getElementById('quiz-container');
+        const submitBtn = document.getElementById('submit-btn');
+        const scoreDisplay = document.getElementById('score-display');
+        const scoreValue = document.getElementById('score-value');
+        const totalQuestionsSpan = document.getElementById('total-questions');
+
+        // Set total questions
+        totalQuestionsSpan.innerText = quizData.length;
+
+        // Function to render all questions
+        function loadQuiz() {
+            let output = '';
+            quizData.forEach((currentQuestion, questionIndex) => {
+                output += `
+                    <div class="question-card" id="q-card-${questionIndex}">
+                        <div class="question-text">${questionIndex + 1}. ${currentQuestion.q}</div>
+                        <div class="options">
+                `;
+                currentQuestion.options.forEach((option, optionIndex) => {
+                    output += `
+                        <label class="option-label" id="label-${questionIndex}-${optionIndex}">
+                            <input type="radio" name="question${questionIndex}" value="${optionIndex}">
+                            ${option}
+                        </label>
+                    `;
+                });
+                output += `
+                        </div>
+                    </div>
+                `;
+            });
+            quizContainer.innerHTML = output;
+        }
+
+        // Function to handle Submit
+        submitBtn.addEventListener('click', () => {
+            let score = 0;
+            
+            quizData.forEach((currentQuestion, questionIndex) => {
+                const selectedOption = document.querySelector(`input[name="question${questionIndex}"]:checked`);
+                
+                // Get all labels for this question
+                const labels = document.querySelectorAll(`#q-card-${questionIndex} .option-label`);
+                const inputs = document.querySelectorAll(`input[name="question${questionIndex}"]`);
+
+                // Disable all inputs after submit
+                inputs.forEach(input => input.disabled = true);
+                labels.forEach(label => label.classList.add('disabled-label'));
+
+                // Highlight the correct answer always
+                labels[currentQuestion.correct].classList.add('correct-ans');
+
+                if (selectedOption) {
+                    if (parseInt(selectedOption.value) === currentQuestion.correct) {
+                        score++;
+                    } else {
+                        // Highlight the wrong answer chosen by user
+                        labels[parseInt(selectedOption.value)].classList.add('wrong-ans');
+                    }
+                }
+            });
+
+            // Show score in Green
+            scoreDisplay.style.display = 'block';
+            scoreValue.innerText = score;
+            
+            // Change button state
+            submitBtn.innerText = "دوبارہ کوشش کریں (Reload to Try Again)";
+            submitBtn.disabled = true;
+            submitBtn.style.backgroundColor = "#95a5a6"; // Grey out button
+        });
+
+        // Initialize Quiz
+        loadQuiz();
+    </script>
+</body>
+</html>
