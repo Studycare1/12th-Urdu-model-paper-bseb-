@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="ur" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Urdu Guess Paper 2026 Quiz</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+    --bg: #e0e5ec;
+    --light: #ffffff;
+    --dark: #a3b1c6;
+    --text: #39445a;
+    --accent: #5b6ef5;
+    --green: #2ed573;
+    --red: #ff4757;
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'Noto Nastaliq Urdu', sans-serif; }
+body { 
+    background-color: var(--bg); color: var(--text); margin: 0; padding: 20px 15px; 
+    display: flex; flex-direction: column; align-items: center; min-height: 100vh;
+}
+h1, h2, h3 { text-align: center; margin-top: 0; }
+.hidden { display: none !important; }
+
+/* Neomorphic Base */
+.neo-box {
+    background: var(--bg); border-radius: 20px; padding: 20px; width: 100%; max-width: 700px;
+    box-shadow: 8px 8px 16px var(--dark), -8px -8px 16px var(--light);
+    margin-bottom: 20px;
+}
+.neo-btn {
+    display: block; width: 100%; padding: 15px; border: none; border-radius: 15px; 
+    background: var(--bg); color: var(--accent); font-weight: 600; font-size: 16px; cursor: pointer;
+    box-shadow: 6px 6px 12px var(--dark), -6px -6px 12px var(--light); transition: .1s;
+}
+.neo-btn:active { box-shadow: inset 4px 4px 8px var(--dark), inset -4px -4px 8px var(--light); transform: scale(0.98); }
+.neo-btn-primary { color: #fff; background: linear-gradient(135deg, #7b8fff, #5b6ef5); box-shadow: 6px 6px 12px var(--dark), -6px -6px 12px var(--light); }
+
+/* Quiz Screen */
+.q-header { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 15px; font-weight: 600; position: sticky; top: 0; background: var(--bg); padding: 10px 0; z-index: 10; border-bottom: 2px solid var(--dark); }
+.q-text { font-size: 18px; font-weight: 600; margin-bottom: 20px; line-height: 1.8; }
+.opt-btn {
+    display: block; width: 100%; text-align: right; padding: 12px; margin-bottom: 10px;
+    border: none; border-radius: 12px; background: var(--bg); color: var(--text); font-size: 16px; cursor: pointer;
+    box-shadow: 4px 4px 8px var(--dark), -4px -4px 8px var(--light); transition: .1s;
+}
+.opt-btn.selected {
+    box-shadow: inset 4px 4px 8px var(--dark), inset -4px -4px 8px var(--light);
+    color: var(--accent); font-weight: bold;
+}
+
+/* Result Screen */
+.result-card { border-right: 6px solid #ccc; padding: 15px; margin-bottom: 15px; background: var(--bg); border-radius: 10px; box-shadow: 4px 4px 8px var(--dark), -4px -4px 8px var(--light); }
+.result-card.correct { border-right-color: var(--green); }
+.result-card.wrong { border-right-color: var(--red); }
+.rs-ans { font-size: 14px; margin-top: 8px; }
+.rs-correct-text { color: var(--green); font-weight: bold; }
+.rs-wrong-text { color: var(--red); font-weight: bold; }
+.rs-reason { font-size: 13px; color: #555; margin-top: 5px; background: rgba(0,0,0,0.05); padding: 5px; border-radius: 5px; }
+
+/* Rank Screen */
+.rank-item {
+    display: flex; justify-content: space-between; padding: 12px; margin-bottom: 10px;
+    border-radius: 10px; box-shadow: 4px 4px 8px var(--dark), -4px -4px 8px var(--light); font-weight: 600;
+}
+.rank-1 { color: #d4af37; } /* Gold */
+.rank-2 { color: #aaa9ad; } /* Silver */
+.rank-3 { color: #cd7f32; } /* Bronze */
+</style>
+</head>
+<body>
+
+<!-- Start Screen (Without Name Input) -->
+<div id="startScreen" class="neo-box">
+    <h2>Urdu Guess Paper Quiz 2026</h2>
+    <p style="text-align:center; font-size:15px; margin-bottom:30px;">ٹیسٹ شروع کرنے کے لیے نیچے بٹن دبائیں</p>
+    <button class="neo-btn neo-btn-primary" onclick="startQuiz()">ٹیسٹ شروع کریں (100 سوالات)</button>
+</div>
+
+<!-- Quiz Screen -->
+<div id="quizScreen" class="hidden">
+    <div class="neo-box" style="max-width: 700px;">
+        <div class="q-header">
+            <span id="qProgress">سوال 1 / 100</span>
+            <span id="qScore">اسکور: 0</span>
+        </div>
+        <div id="quizContent" style="max-height: 65vh; overflow-y: auto; padding-left: 10px;"></div>
+        <button class="neo-btn neo-btn-primary" style="margin-top: 20px;" onclick="submitQuiz()">ٹیسٹ جمع کریں</button>
+    </div>
+</div>
+
+<!-- Result Screen -->
+<div id="resultScreen" class="hidden">
+    <div class="neo-box" style="text-align: center;">
+        <h2>آپ کا نتیجہ</h2>
+        <h1 id="finalScore" style="color: var(--accent); font-size: 40px;">0 / 100</h1>
+        <button class="neo-btn" onclick="showRankScreen()">رینک لسٹ دیکھیں 🏆</button>
+        <button class="neo-btn" style="margin-top:10px; color: var(--text);" onclick="location.reload()">دوبارہ کھیلیں</button>
+    </div>
+    <div id="reviewArea" style="max-width: 700px;"></div>
+</div>
+
+<!-- Rank Screen -->
+<div id="rankScreen" class="hidden">
+    <div class="neo-box" style="max-width: 600px;">
+        <h2>🏆 Rank List 🏆</h2>
+        <div id="rankList"></div>
+        <button class="neo-btn" style="margin-top: 20px; color: var(--text);" onclick="location.reload()">واپس جائیں</button>
+    </div>
+</div>
+
+<script>
+// 100 MCQs
+const quizData = [
+    { q: "غزل کی زبان کا لفظ ہے؟", options: ["فارسی", "اردو", "عربی", "ترکی"], correct: 2, reason: "صحیح جواب: عربی" },
+    { q: "اردو تنقید کا پانی کس نے کہا ہے؟", options: ["محسنین آزاد", "شمیم عثمانی", "مولانا حالی", "سید سلیمان ندوی"], correct: 2, reason: "صحیح جواب: مولانا حالی" },
+    { q: "مسلسل اور طویل نظم کو کیا کہتے ہیں؟", options: ["مثنوی", "رباعی", "نظم", "قصیدہ"], correct: 0, reason: "صحیح جواب: مثنوی" },
+    { q: "مرزا تقی میر کو کس صنف کا بادشاہ کہلاتے ہیں؟", options: ["قصیدہ", "مثنوی", "رباعی", "غزل"], correct: 3, reason: "صحیح جواب: غزل" },
+    { q: "تحریک آزادی میں کس ادیب کا اہم کردار ہے؟", options: ["شمیم عثمانی", "مولانا آزاد", "سر سید احمد خان", "اقبال"], correct: 1, reason: "صحیح جواب: مولانا آزاد" },
+    { q: "جیلانی بانوی کی پیدائش کہاں ہوئی؟", options: ["گھوٹکی", "میرٹھ", "سہارنپور", "دلی"], correct: 2, reason: "صحیح جواب: سہارنپور" },
+    { q: "شخص جاوید کی مصنف ہیں؟", options: ["شمیم عثمانی", "انشائیہ", "خاکہ", "افسانہ"], correct: 1, reason: "صحیح جواب: انشائیہ" },
+    { q: "شفیع جاوید کا پہلا افسانہ کس رسالے میں شائع ہوا؟", options: ["ساقی", "مخزن", "اپنی", "شمع"], correct: 2, reason: "صحیح جواب: اپنی" },
+    { q: "غبار خاطر کے خطوط کس جیل سے لکھے گئے؟", options: ["ہزاری باغ جیل", "باگی پور جیل", "قلعہ احمد نگر جیل", "تاج محل جیل"], correct: 2, reason: "صحیح جواب: قلعہ احمد نگر جیل" },
+    { q: "رسالہ تہذیب الاخلاق کس نے جاری کیا؟", options: ["مولانا حالی", "مولوی عبدالحق", "محسنین آزاد", "سرسید احمد خان"], correct: 3, reason: "صحیح جواب: سرسید احمد خان" },
+    { q: "نظم 'ہم گئے' کس کی نظم ہے؟", options: ["جذبی", "فیض احمد فیض", "ن م راشد", "علی سردار جعفری"], correct: 3, reason: "صحیح جواب: علی سردار جعفری" },
+    { q: "علی سردار جعفری کی پیدائش کہاں ہوئی؟", options: ["گورکھپور", "الہ آباد", "دہلی", "لکھنؤ"], correct: 0, reason: "صحیح جواب: گورکھپور" },
+    { q: "نظم 'سخی' کا مرکزی کردار کون ہے؟", options: ["انسان", "وقت", "کسان", "دنیا"], correct: 1, reason: "صحیح جواب: وقت" },
+    { q: "علی سردار جعفری کی وفات کب ہوئی؟", options: ["1998ء", "2000ء", "1999ء", "2001ء"], correct: 1, reason: "صحیح جواب: 2000ء" },
+    { q: "'برق کلیسا' کس کی نظم ہے؟", options: ["ن م راشد", "شبیر", "میراجی", "فراق گورکھپوری"], correct: 0, reason: "صحیح جواب: ن م راشد" },
+    { q: "اکبر الہ آبادی کی شاعری کے عناصر؟", options: ["طنز و مزاح", "رومانی", "حقیقت نگاری", "تصوف"], correct: 0, reason: "صحیح جواب: طنز و مزاح" },
+    { q: "'تضاد' عنصر سے کس قدر زیادہ کا تعلق؟", options: ["دونوں", "طنزیہ", "سنجیدہ", "رومانی"], correct: 0, reason: "صحیح جواب: دونوں" },
+    { q: "'تضاد' عنصر کس طرح کی نظم ہے؟", options: ["طنزیہ", "رومانی", "سنجیدہ", "رومانی"], correct: 0, reason: "صحیح جواب: طنزیہ" },
+    { q: "نصاب میں شامل نظم 'ہم نہیں جانتے' کا ترجمہ کس زبان سے؟", options: ["انگریزی", "جرمن", "بنگالی", "فرانسیسی"], correct: 2, reason: "صحیح جواب: بنگالی" },
+    { q: "غزل کا پہلا شعر جس میں دونوں مصرعے ہم قافیہ ہوتے ہیں کیا کہلاتا ہے؟", options: ["مقطع", "حسن مطلع", "ذیل مطلع", "مطلع"], correct: 3, reason: "صحیح جواب: مطلع" },
+    { q: "مولانا آزاد پہلی بار کس عمر میں کالج سے صدر ہوئے؟", options: ["35 سال", "40 سال", "42 سال", "45 سال"], correct: 0, reason: "صحیح جواب: 35 سال" },
+    { q: "مولانا آزاد کس ملک میں پیدا ہوئے؟", options: ["ہندوستان", "پاکستان", "سعودی عرب", "بنگلہ دیش"], correct: 0, reason: "صحیح جواب: ہندوستان" },
+    { q: "اردو کی پہلی خود نوشت کا نام بتائیں؟", options: ["اعمال نامہ", "کالا پانی", "انشائیہ", "آب حیات"], correct: 1, reason: "صحیح جواب: کالا پانی" },
+    { q: "احسان دانش کی تجربہ کس صنف سے ہے؟", options: ["سوانح", "خود نوشت", "طنز", "مزاح"], correct: 1, reason: "صحیح جواب: خود نوشت" },
+    { q: "غلط نامہ کا صیح ہے؟", options: ["افسانہ", "ناول", "ڈرامہ", "انشائیہ"], correct: 0, reason: "صحیح جواب: افسانہ" },
+    { q: "رجب علی بیگ سرور کہاں کے باشندے تھے؟", options: ["لکھنؤ", "الہ آباد", "علی گڑھ", "کاکوری"], correct: 0, reason: "صحیح جواب: لکھنؤ" },
+    { q: "فن آزاد کی معاشرت کس نے پیش کی ہے؟", options: ["لکھنؤ", "دہلی", "حیدرآباد", "عظیم آباد"], correct: 0, reason: "صحیح جواب: لکھنؤ" },
+    { q: "دبستان دہلی کے خالق کے دور میں مجموعہ کا نام کیا ہے؟", options: ["غبار خاطر", "نثر آزاد", "اردو، پنجابی", "محمد کاظم"], correct: 2, reason: "صحیح جواب: اردو، پنجابی" },
+    { q: "مرزا غالب کی وفات کب ہوئی؟", options: ["1867ء", "1870ء", "1869ء", "1866ء"], correct: 2, reason: "صحیح جواب: 1869ء" },
+    { q: "دبستان میں کس نظریاتی سردار جعفری کی ہے؟", options: ["میر انیس", "میر تقی میر", "مولانا حالی", "غالب"], correct: 2, reason: "صحیح جواب: مولانا حالی" },
+    { q: "خود غرض انسان کے والد کا کیا نام تھا؟", options: ["سید بدر الدین", "سید محمد", "سید علی", "سید مسعود"], correct: 1, reason: "صحیح جواب: سید محمد" },
+    { q: "سید سلیمان ندوی کا پہلا مضمون کس اخبار میں شائع ہوا؟", options: ["الہلال", "البلال", "البلاغ", "الہام"], correct: 2, reason: "صحیح جواب: البلاغ" },
+    { q: "سید سلیمان ندوی کس کے شاگرد تھے؟", options: ["حالی", "ابوالکلام آزاد", "شبلی نعمانی", "سرسید احمد خان"], correct: 2, reason: "صحیح جواب: شبلی نعمانی" },
+    { q: "مضمون 'انشائیہ کیوں ہے' کے مصنف کون ہیں؟", options: ["ڈاکٹر آغا", "پطرس بخاری", "فرحت اللہ بیگ", "رشید احمد صدیقی"], correct: 0, reason: "صحیح جواب: ڈاکٹر آغا" },
+    { q: "ڈاکٹر آغا کی پیدائش کب ہوئی؟", options: ["1925ء", "1921ء", "1924ء", "1929ء"], correct: 1, reason: "صحیح جواب: 1921ء" },
+    { q: "یعقوب اور یوسف میں کیا نسبت ہے؟", options: ["بھائی", "رشتہ داری", "استاد شاگرد", "باپ بیٹا"], correct: 0, reason: "صحیح جواب: بھائی" },
+    { q: "'ہجرت' کیا ہے؟", options: ["ناول", "افسانہ", "ڈرامہ", "انشائیہ"], correct: 1, reason: "صحیح جواب: افسانہ" },
+    { q: "احمد جمال پاشا کے والد کا کیا نام تھا؟", options: ["کرامت حسین", "شجاعت حسین", "صداقت حسین", "رفاقت حسین"], correct: 0, reason: "صحیح جواب: کرامت حسین" },
+    { q: "فورٹ ولیم کالج کہاں قائم کیا گیا تھا؟", options: ["حیدرآباد", "دہلی", "لاہور", "کلکتہ"], correct: 3, reason: "صحیح جواب: کلکتہ" },
+    { q: "دبستان دہلی کے کس نے کتاب منصوب ہے؟", options: ["قصہ چہار درویش", "فنون لطیفہ", "باغ و بہار", "آرائش محفل"], correct: 3, reason: "صحیح جواب: آرائش محفل" },
+    { q: "'مرزاتو شہ' کے کیا ہیں؟", options: ["میر", "شعرا", "غالب", "مشتاق"], correct: 1, reason: "صحیح جواب: شعرا" },
+    { q: "'ہم چراغوں کے لینے' پہنچ کے کا مطلب؟", options: ["ہاتھ", "مہر", "سوا", "درد"], correct: 0, reason: "صحیح جواب: ہاتھ" },
+    { q: "درج ذیل میں کون سا لفظ مذکر ہے؟", options: ["اذان", "بیدق", "باغ", "افواہ"], correct: 2, reason: "صحیح جواب: باغ" },
+    { q: "درج ذیل میں کون سا لفظ مونث ہے؟", options: ["بازار", "اظہار", "اشارہ", "پتھر"], correct: 2, reason: "صحیح جواب: اشارہ" },
+    { q: "درج ذیل میں 'آدم آدم' کون ہے؟", options: ["دستانہ", "کتب خانہ", "چوکھٹ", "خوبصورت"], correct: 1, reason: "صحیح جواب: کتب خانہ" },
+    { q: "درج ذیل میں کون سا محاورہ ہے؟", options: ["ٹخنہ", "پہاڑ", "آری", "دنیا"], correct: 0, reason: "صحیح جواب: ٹخنہ" },
+    { q: "وہ جملہ جو کسی خیالی یا فرضی بات پر دال ہو تو اسے کیا کہتے ہیں؟", options: ["خطاب", "لقب", "فعل", "کیتھ"], correct: 2, reason: "صحیح جواب: فعل" },
+    { q: "'ذات' کی ضد کیا ہوگی؟", options: ["عزت", "وفا", "جفا", "عظمت"], correct: 0, reason: "صحیح جواب: عزت" },
+    { q: "'ناک میں دم کرنا' کا مطلب کیا ہے؟", options: ["ناک میں دوا ڈالنا", "تنگ کرنا", "پردہ ہونا", "پریشان کرنا"], correct: 1, reason: "صحیح جواب: تنگ کرنا" },
+    { q: "'شوق' کا مترادف کیا ہوگا؟", options: ["ذوق", "خوف", "شائق", "لطف"], correct: 0, reason: "صحیح جواب: ذوق" },
+    { q: "'حسرت بیان' کیا ہے؟", options: ["مشوی", "رباعی", "ناول", "قصیدہ"], correct: 1, reason: "صحیح جواب: رباعی" },
+    { q: "نظام جدید کے ارتقاء میں کس انجمن کی تاریخی اہمیت ہے؟", options: ["انجمن پنجاب", "ادبی انجمن", "انجمن حمایت اسلام", "انجمن ترقی اردو"], correct: 2, reason: "صحیح جواب: انجمن حمایت اسلام" },
+    { q: "درج ذیل شعراء میں سے کس کا تعلق علوم سے رہا ہے؟", options: ["شاد عظیم آبادی", "غالب", "اقبال", "ساحر لدھیانوی"], correct: 1, reason: "صحیح جواب: غالب" },
+    { q: "گرائمر کا تعلق کس فن سے ہے؟", options: ["غزل", "مرثیہ", "رباعی", "قصیدہ"], correct: 0, reason: "صحیح جواب: غزل" },
+    { q: "امن پسندوں کے ہمدردی کے شاعر کون ہیں؟", options: ["ولی دکنی", "سودا", "شبیر", "فیض احمد فیض"], correct: 1, reason: "صحیح جواب: سودا" },
+    { q: "رات کی پیدائش کہاں ہوئی؟", options: ["لکھنؤ", "مرشد آباد", "گیا", "عظیم آباد"], correct: 0, reason: "صحیح جواب: لکھنؤ" },
+    { q: "'زلف' کے معنی کیا ہے؟", options: ["درد", "ولی دکنی", "لاوخی", "گھنگھور"], correct: 3, reason: "صحیح جواب: گھنگھور" },
+    { q: "ولی کی تاریخ وفات کیا ہے؟", options: ["1700ء", "1720ء", "1725ء", "کوئی نہیں"], correct: 0, reason: "صحیح جواب: 1700ء" },
+    { q: "مزار کا حال کس باغ میں ہے؟", options: ["آگرہ", "بھنڈی", "راجی", "کوئی نہیں"], correct: 0, reason: "صحیح جواب: آگرہ" },
+    { q: "دبستان دہلی کے سب سے بڑے غزل گو شاعر کون ہیں؟", options: ["ولی دکنی", "نواسی", "قلق شبشاہ", "اینشاشامی"], correct: 0, reason: "صحیح جواب: ولی دکنی" },
+    { q: "میر کی زبان مختصر بیان کی؟", options: ["انوں", "مان", "انشاء", "سادہ"], correct: 3, reason: "صحیح جواب: سادہ" },
+    { q: "اردو کی پہلی ادبی داستان کی شناخت کریں:", options: ["قصہ مہر و ماہ", "سس رک", "باغ و بہار", "داستان امیر حمزہ"], correct: 0, reason: "صحیح جواب: قصہ مہر و ماہ" },
+    { q: "داستان 'باغ و بہار' کے مصنف کون ہیں؟", options: ["ولی دکنی", "میر امن", "ملاجی", "دین محمد"], correct: 1, reason: "صحیح جواب: میر امن" },
+    { q: "اردو میں مختصر افسانے کی صنف کہاں سے آئی؟", options: ["عربی سے", "فارسی سے", "مغرب سے", "یونان سے"], correct: 2, reason: "صحیح جواب: مغرب سے" },
+    { q: "نیو کلاسیکل دور کا نام بتائیں؟", options: ["ارشد گھگی", "شعوری", "ہری گھگی", "فضل دین"], correct: 1, reason: "صحیح جواب: شعوری" },
+    { q: "مختصر افسانہ کی روایت کب شروع ہوئی؟", options: ["پہلے اردو", "بی بی", "سعادت حسن منٹو", "سجاد حیدر یلدرم"], correct: 0, reason: "صحیح جواب: پہلے اردو" },
+    { q: "قتیل شفائی کی اکثر نظمیں کس پر مبنی ہیں؟", options: ["1935ء", "1937ء", "1934ء", "1940ء"], correct: 0, reason: "صحیح جواب: 1935ء" },
+    { q: "سعادت حسن منٹو کی وفات کب ہوئی؟", options: ["1955ء", "1957ء", "1956ء", "1954ء"], correct: 0, reason: "صحیح جواب: 1955ء" },
+    { q: "'پراس' کس کا افسانہ ہے؟", options: ["غلام عباس", "شوکت صدیقی", "عصمت چغتائی", "شائع ہادی"], correct: 2, reason: "صحیح جواب: عصمت چغتائی" },
+    { q: "'پراس' کیا ہے؟", options: ["ناول", "ڈرامہ", "افسانہ", "مشوی"], correct: 2, reason: "صحیح جواب: افسانہ" },
+    { q: "مادری زبان کون سی ہے؟", options: ["کنڑ", "اودھ", "دلی", "کاکا تے"], correct: 0, reason: "صحیح جواب: کنڑ" },
+    { q: "مادر علمی کا مکمل نام کیا ہے؟", options: ["امراؤ جان", "انورا جان", "اسرا جان", "الہی بخش"], correct: 0, reason: "صحیح جواب: امراؤ جان" },
+    { q: "جوش کی خود نوشت کا نام کیا ہے؟", options: ["دوحاب", "یادوں کی بارات", "شعلہ نوا", "قفس"], correct: 1, reason: "صحیح جواب: یادوں کی بارات" },
+    { q: "درج ذیل میں سے کون سی تحریر افسانہ ہے؟", options: ["آوازہ", "کالا الہاب", "خواب", "گمشدہ اور خواب"], correct: 3, reason: "صحیح جواب: گمشدہ اور خواب" },
+    { q: "میر بند کی وفات کب ہوئی؟", options: ["1870ء", "1872ء", "1873ء", "1874ء"], correct: 3, reason: "صحیح جواب: 1874ء" },
+    { q: "مرثیہ کے لیے پہلی بار کس نے اہمیت اختیار کی؟", options: ["میر تقی میر", "انیس", "سودا", "دبیر"], correct: 0, reason: "صحیح جواب: میر تقی میر" },
+    { q: "مرثیہ 'نور سحر' کب لکھی گئی؟", options: ["1503ء", "1504ء", "1505ء", "1503ء"], correct: 0, reason: "صحیح جواب: 1503ء" },
+    { q: "عطا کاکوی کی کون سی نظم نصاب میں شامل ہے؟", options: ["قلم اردو", "غم راشد", "غم راشد", "غم راشد"], correct: 0, reason: "صحیح جواب: قلم اردو" },
+    { q: "درج ذیل میں سے الطاف حسین حالی کی تصنیف کون ہے؟", options: ["اردو ادب کی تاریخ", "ترقی پسند شاعری", "نیا ادب", "مقدمہ شعر و شاعری"], correct: 3, reason: "صحیح جواب: مقدمہ شعر و شاعری" },
+    { q: "اکبر الہ آبادی کو 'خان بہادر' کے خطاب سے کب نوازا گیا؟", options: ["1895ء", "1898ء", "1897ء", "1896ء"], correct: 1, reason: "صحیح جواب: 1898ء" },
+    { q: "درج ذیل میں سے کون مشہور شاعر ہیں؟", options: ["نظیری", "آتش", "فائز", "ذوق"], correct: 0, reason: "صحیح جواب: نظیری" },
+    { q: "'ساقی نامہ' کس شاعر نے لکھا ہے؟", options: ["قلی ہدایتی", "میر تقی میر", "ساحر لدھیانوی", "سردار جعفری"], correct: 1, reason: "صحیح جواب: میر تقی میر" },
+    { q: "گرائمر کا تعلق کس صنف شاعری سے ہے؟", options: ["غزل", "قصیدہ", "مرثیہ", "رباعی"], correct: 1, reason: "صحیح جواب: قصیدہ" },
+    { q: "ایسی نظم کو کیا کہتے ہیں جس میں کسی کی تعریف بیان کی جاتی ہے؟", options: ["قطعہ", "مرثیہ", "مشوی", "قصیدہ"], correct: 3, reason: "صحیح جواب: قصیدہ" },
+    { q: "سودا کس حیثیت سے مشہور ہیں؟", options: ["مرثیہ گو", "غزل گو", "رباعی گو", "قصیدہ گو"], correct: 3, reason: "صحیح جواب: قصیدہ گو" },
+    { q: "ڈپٹی نذیر احمد کی مشہور شخصیت کے استاد کون تھے؟", options: ["عظیم بیگ", "عبداللہ بیگ", "مولوی عبداللہ", "فرحت اللہ بیگ"], correct: 2, reason: "صحیح جواب: مولوی عبداللہ" },
+    { q: "ڈپٹی نذیر احمد کی کہانی کا تعلق کس صنف ادب سے ہے؟", options: ["افسانہ", "ناول", "ڈرامہ", "انشائیہ"], correct: 0, reason: "صحیح جواب: افسانہ" },
+    { q: "اردو کا پہلا ناول نگار کون ہے؟", options: ["مولوی ذکاء اللہ", "مولوی عبدالحق", "فرحت اللہ بیگ", "مولوی عبدالصمد"], correct: 0, reason: "صحیح جواب: مولوی ذکاء اللہ" },
+    { q: "ڈپٹی نذیر احمد کی کہانیوں کی شکل میں کس نے پیش کیا؟", options: ["پہلے چند", "حالی", "خواجہ حسن نظامی", "ڈپٹی نذیر احمد"], correct: 0, reason: "صحیح جواب: پہلے چند" },
+    { q: "'معصوم فرشتے' اردو کے کس شاعر کا افسانہ ہے؟", options: ["خواجہ حسن نظامی", "سرسید احمد خان", "ترن تار سہار", "رشید احمد صدیقی"], correct: 0, reason: "صحیح جواب: خواجہ حسن نظامی" },
+    { q: "'ماضی کی مثال' کے:", options: ["ماضی کی مثال", "کامیا", "کامیا", "کہتا ہے"], correct: 0, reason: "صحیح جواب: ماضی کی مثال" },
+    { q: "ان میں صنف کون ہے؟", options: ["حرکت", "محرک", "جہالت", "کوئی نہیں"], correct: 0, reason: "صحیح جواب: حرکت" },
+    { q: "طنز کی ضد کیا ہوگی؟", options: ["جامل", "جھل", "جہلا", "سنجیدگی"], correct: 3, reason: "صحیح جواب: سنجیدگی" },
+    { q: "حسن کا مترادف کیا ہوگا؟", options: ["جمال", "کمال", "جھیل", "خوبصورت"], correct: 3, reason: "صحیح جواب: خوبصورت" },
+    { q: "درج ذیل میں اسم نکرہ کون ہے؟", options: ["قلم", "قائد", "مقول", "کوئی نہیں"], correct: 0, reason: "صحیح جواب: قلم" },
+    { q: "ان میں سے مذکر کی شناخت کیجیے:", options: ["تعلیم", "خوشبو", "بدبو", "اخبار"], correct: 0, reason: "صحیح جواب: تعلیم" },
+    { q: "درج ذیل میں سے مونث کی شناخت کیجیے:", options: ["قلم", "آبرو", "اثر", "کاغذ"], correct: 1, reason: "صحیح جواب: آبرو" },
+    { q: "'تم کہاں جا رہے ہو؟' یہ کس طرح کا جملہ ہے؟", options: ["استفہامیہ", "خبریہ", "امریہ", "فجائیہ"], correct: 0, reason: "صحیح جواب: استفہامیہ" },
+    { q: "امانت کا مترادف کیا ہوگا؟", options: ["وکالت", "دیانت", "کرامت", "خیانت"], correct: 1, reason: "صحیح جواب: دیانت" },
+    { q: "درج ذیل میں اسم نکرہ کون ہے؟", options: ["گنگا", "آری", "تاج محل", "پتہ"], correct: 0, reason: "صحیح جواب: گنگا" }
+];
+
+let currentUser = "";
+let userAnswers = [];
+let currentScore = 0;
+
+function startQuiz() {
+    // Auto-generate a random student name for the rank list
+    currentUser = "طالب علم " + Math.floor(1000 + Math.random() * 9000);
+    
+    document.getElementById('startScreen').classList.add('hidden');
+    document.getElementById('quizScreen').classList.remove('hidden');
+    
+    userAnswers = new Array(quizData.length).fill(null);
+    renderQuestions();
+}
+
+function renderQuestions() {
+    const container = document.getElementById('quizContent');
+    container.innerHTML = '';
+    
+    quizData.forEach((item, index) => {
+        const div = document.createElement('div');
+        div.style.marginBottom = '25px';
+        div.innerHTML = `<div class="q-text">${index + 1}. ${item.q}</div>`;
+        
+        item.options.forEach((opt, optIndex) => {
+            const btn = document.createElement('button');
+            btn.className = 'opt-btn';
+            btn.innerHTML = opt;
+            btn.onclick = () => selectOption(index, optIndex, btn, div);
+            div.appendChild(btn);
+        });
+        container.appendChild(div);
+    });
+}
+
+function selectOption(qIndex, oIndex, btn, parentDiv) {
+    userAnswers[qIndex] = oIndex;
+    const siblings = parentDiv.querySelectorAll('.opt-btn');
+    siblings.forEach(s => s.classList.remove('selected'));
+    btn.classList.add('selected');
+}
+
+function submitQuiz() {
+    if(userAnswers.includes(null)) {
+        if(!confirm("آپ نے کچھ سوالات کے جوابات نہیں دیے۔ کیا آپ پھر بھی جمع کرنا چاہتے ہیں؟")) return;
+    }
+
+    currentScore = 0;
+    const reviewArea = document.getElementById('reviewArea');
+    reviewArea.innerHTML = '<h3 style="text-align:center; margin-top:30px;">جوابات کی جانچ پڑتال</h3>';
+
+    quizData.forEach((item, index) => {
+        const isCorrect = userAnswers[index] === item.correct;
+        if (isCorrect) currentScore++;
+
+        const card = document.createElement('div');
+        card.className = `result-card ${isCorrect ? 'correct' : 'wrong'}`;
+        
+        let html = `<div style="font-weight:bold; margin-bottom:10px;">${index+1}. ${item.q}</div>`;
+        html += `<div class="rs-ans">آپ کا جواب: <span class="${isCorrect ? 'rs-correct-text' : 'rs-wrong-text'}">${userAnswers[index] !== null ? item.options[userAnswers[index]] : 'نہیں دیا'}</span></div>`;
+        
+        if (!isCorrect) {
+            html += `<div class="rs-ans">صحیح جواب: <span class="rs-correct-text">${item.options[item.correct]}</span></div>`;
+        }
+        html += `<div class="rs-reason">💡 ${item.reason}</div>`;
+        
+        card.innerHTML = html;
+        reviewArea.appendChild(card);
+    });
+
+    document.getElementById('quizScreen').classList.add('hidden');
+    document.getElementById('resultScreen').classList.remove('hidden');
+    document.getElementById('finalScore').innerText = `${currentScore} / ${quizData.length}`;
+
+    saveScore(currentUser, currentScore, quizData.length);
+}
+
+function saveScore(name, score, total) {
+    let leaderboard = JSON.parse(localStorage.getItem('urduQuizRanks100')) || [];
+    leaderboard.push({ name: name, score: score, total: total, date: new Date().toLocaleDateString() });
+    leaderboard.sort((a, b) => b.score - a.score);
+    leaderboard = leaderboard.slice(0, 50);
+    localStorage.setItem('urduQuizRanks100', JSON.stringify(leaderboard));
+}
+
+function showRankScreen() {
+    const password = prompt("رینک لسٹ دیکھنے کے لیے پاس ورڈ درج کریں:");
+    if (password !== "@1234") {
+        alert("غلط پاس ورڈ!");
+        return;
+    }
+
+    const leaderboard = JSON.parse(localStorage.getItem('urduQuizRanks100')) || [];
+    const listDiv = document.getElementById('rankList');
+    listDiv.innerHTML = '';
+
+    if(leaderboard.length === 0) {
+        listDiv.innerHTML = '<p style="text-align:center;">ابھی کوئی ریکارڈ موجود نہیں ہے۔</p>';
+    } else {
+        leaderboard.forEach((entry, index) => {
+            let rankClass = index === 0 ? 'rank-1' : index === 1 ? 'rank-2' : index === 2 ? 'rank-3' : '';
+            let medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : (index + 1) + '.';
+            
+            const div = document.createElement('div');
+            div.className = `rank-item ${rankClass}`;
+            div.innerHTML = `
+                <span>${medal} ${entry.name}</span>
+                <span style="color:var(--accent);">${entry.score} / ${entry.total}</span>
+            `;
+            listDiv.appendChild(div);
+        });
+    }
+
+    document.getElementById('resultScreen').classList.add('hidden');
+    document.getElementById('rankScreen').classList.remove('hidden');
+}
+</script>
+</body>
+</html>
